@@ -38,7 +38,9 @@
                     body: fd
                 })
                 const obj = await res.json();
+                console.log(obj);
                 document.querySelector('#img01').src='/img/' + obj.filename;
+                console.log("上傳解譯的字串 : "+document.querySelector('#img01').src);
                 document.fake_form.my_img.value = obj.filename;
 
         })

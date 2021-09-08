@@ -19,6 +19,9 @@
                 <input type="text" class="form-control" id="my_img" name="my_img">
             </div>
             <!-- <button type="submit" class="btn btn-primary">submit</button> -->
+            <div id="imghere">
+
+            </div>
         </form>
 
 
@@ -28,7 +31,7 @@
         </form>
     </div>
 
-    <script>
+    <script type="text/javascript">
         const photo = document.querySelector('#photo');
 
         photo.addEventListener('change', async event => {
@@ -38,16 +41,26 @@
                 body: fd
             })
             const obj = await res.json();
-            console.log(obj);
-            console.log(obj[0].filename);
-            
+            // console.log(obj);
+            // console.log(obj[0].filename);
+            // console.log("印出每個檔案總數量 : ", obj.length);
 
-            document.querySelector('#form').innerHTML= `<img src="/img/${obj[0].filename} width="300px"`;
+            for (var i = 0; i < obj.length; i++) {
+                const item = obj[i].filename;
+                // console.log("印出每個檔案名字 : ", item);
 
-
-
-            // console.log(element));
-
+                // 將新增的DOM設為變數
+                var img = document.createElement("img");
+                
+                // 修改img的src，將其設為動態
+                img.src = `/img/${item}`;
+                // 給予DOM相對應的屬性，如果有設定好的class，可以用下面的方式
+                img.setAttribute("width", "300px");
+                // img.classList.add("className");
+                
+                document.getElementById('imghere').appendChild(img); 
+    
+            }
 
         })
     </script>
