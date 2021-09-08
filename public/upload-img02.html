@@ -51,15 +51,17 @@
 
                 // 將新增的DOM設為變數
                 var img = document.createElement("img");
-                
+                var input = document.createElement('input');
                 // 修改img的src，將其設為動態
                 img.src = `/img/${item}`;
+                input.value = `${item}`;
                 // 給予DOM相對應的屬性，如果有設定好的class，可以用下面的方式
                 img.setAttribute("width", "300px");
                 // img.classList.add("className");
                 
                 document.getElementById('imghere').appendChild(img); 
-    
+                input.classList.add('form-control');
+                document.querySelector('form').appendChild(input);
             }
 
         })
