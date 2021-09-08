@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+        // Promise建立好後，會處於等待的狀態，這時會先執行下面的程式，然後才回來繼續執行
+        // 不能用try catch 去捕捉並處理錯誤，因為他只能處理同步的，Promise是屬於非同步
+
+        new Promise((resolve, reject) => {
+                const rnd = 300 + Math.floor(Math.random() * 1000);
+                setTimeout(() => {
+                    resolve(rnd);
+                    // resolve(['Abc, bac, cbd']);
+                    //一次只能用一個resolve，一個resolve只能丟一個值，要多個值就用array的形式
+
+                    // reject('my-error');
+                    // reject 會直接將程式擋住
+
+                }, 1000);
+            }).then(r => {
+                // throw new Error('error2');
+                // 自訂丟出一個錯誤物件
+
+                console.log('2:', r, new Date());
+                return new Promise((resolve, reject) => {
+                    const rnd = 300 + Math.floor(Math.random() * 1000);
+                    setTimeout(() => {
+                        resolve(rnd);
+                    }, 1000);
+                });
+                
+                //如果在 then 裡面放入promise，下一個then就會造成時間差
+            }).then(r => {
+                // throw new Error('error2');
+                // 自訂丟出一個錯誤物件
+
+                console.log('3:', r, new Date());
+            })
+            .catch(err => {
+                console.log('error:', err);
+                // catch 寫在這就是有處理錯誤，不會造成整個伺服器掛掉
+            })
+
+        // catch寫在最後面，這樣才能捕捉到所有程式的錯誤
+
+
+        // console.log('1:', new Date());
+        // 上面的 console.log 只是用來示範資料傳遞順序
+    </script>
+</body>
+
+</html>
