@@ -3,11 +3,14 @@ require('dotenv').config(); // 載入 .env 的設定
 const express = require('express');
 const multer = require('multer');
 const fs = require('fs').promises;
+const session = require('express-session');
+const moment = require('moment-timezone');
 const upload = multer({
     dest: 'tmp_uploads'
 })
 const uploadImg = require('./modules/upload-images')
 const uploadVid = require('./modules/upload-videos')
+const db = require('./modules/connect-mysql')
 
 
 
@@ -18,6 +21,16 @@ app.set('view engine', 'ejs');
 /*
 指定需要用的樣板引擎，這是預設位置，所以不需要再多一行設定，如果有改資料夾才需要用PDF裡的方式
 */
+
+app.use(session({
+    name: 'mySessionId',
+    saveUninitialized: false,
+    resave: false,
+    secret: '54weewf254ewf4874gew231',
+    cookie: {
+        maxAge: 1200000, //20分鐘，這裡寫得是毫秒
+    }
+}));
 
 // parse application/x-www-form-urlencoded
 app.use(express.urlencoded({
@@ -32,10 +45,21 @@ app.use('/', express.static('public'));
 app.use('/jquery', express.static('node_modules/jquery/dist'));
 app.use('/bootstrap', express.static('node_modules/bootstrap/dist'));
 
+app.use((req, res, next) => {
+    // res.send('middleware'); 不要在這裡用send，會出錯
+    res.locals.title = '小心的網站';
+    // 這裡可以設定所有網站的title
+    next();
+})
+
 
 // ***路由定義開始 ：BEGIN
 
 app.get('/', (req, res) => {
+
+    res.locals.title = '首頁-' + res.locals.title;
+    // 各個頁面可以再做更改
+    // 也可以用來判斷會員是否有登入，或者是會員身分
 
     res.render('home', {
         name: 'Josh'
@@ -88,6 +112,8 @@ app.post('/try-upload', upload.single('avatar'), async (req, res) => {
     if (req.file && req.file.mimetype === 'image/jpeg') {
         try {
             await fs.rename(req.file.path, __dirname + '/public/img/' + req.file.originalname);
+            // 有await的時候可以用try catch，因為是一行行執行下來的
+
             return res.json({
                 success: true,
                 filename: req.file.originalname
@@ -137,7 +163,34 @@ app.get(/^\/m\/09\d{2}-?\d{3}-?\d{3}$/i, (req, res) => {
         mobile: u
     });
 });
+
 app.use(require('./routes/admin2'));
+app.use('/admin3', require('./routes/admin3'));
+
+//admin2、admin3，兩者的路徑並不一樣，所以可以用作檔案版本管理
+
+//合併寫路徑進來的時後都會用app，如果要分開管理時就會用router，router都會寫在分開的檔案哩，在這裡的例子是admin
+
+app.get('/try-sess', (req, res) => {
+    req.session.myVar = req.session.myVar || 0;
+    req.session.myVar++;
+    res.json(req.session);
+})
+
+app.get('/try-moment', (req, res) => {
+    const fm = 'YYYY-MM-DD HH:mm:ss';
+
+    res.json({
+        "m1-local": moment().format(fm),
+        "m2-London": moment().tz('Europe/London').format(fm),
+        "m3-Tokyo": moment().tz('Asia/Tokyo').format(fm),
+    });
+});
+
+app.get('/try-db', async (req, res)=>{
+    const [result]= await db.query('SELECT * FROM address_book WHERE `name` LIKE ?', ['%酷寶%'])
+    res.json(result);
+});
 // ***路由定義結束 ：END
 
 
