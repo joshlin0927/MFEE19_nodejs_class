@@ -4,6 +4,9 @@ const express = require('express');
 const multer = require('multer');
 const fs = require('fs').promises;
 const session = require('express-session');
+const MysqlStore = require('express-mysql-session')(session); 
+// 上面require進來的是一個function，而要帶入的值是session
+
 const moment = require('moment-timezone');
 const upload = multer({
     dest: 'tmp_uploads'
@@ -11,7 +14,10 @@ const upload = multer({
 const uploadImg = require('./modules/upload-images')
 const uploadVid = require('./modules/upload-videos')
 const db = require('./modules/connect-mysql')
-
+const sessionStore = new MysqlStore({}, db);
+/*
+因為我們已經有連線的設定，也就是connect-mysql，所以在大括號裡面不需要放任何東西，只要在最後放上要連到哪裡就好
+*/
 
 
 const app = express();
@@ -27,6 +33,7 @@ app.use(session({
     saveUninitialized: false,
     resave: false,
     secret: '54weewf254ewf4874gew231',
+    store: sessionStore,
     cookie: {
         maxAge: 1200000, //20分鐘，這裡寫得是毫秒
     }
@@ -49,6 +56,11 @@ app.use((req, res, next) => {
     // res.send('middleware'); 不要在這裡用send，會出錯
     res.locals.title = '小心的網站';
     // 這裡可以設定所有網站的title
+    res.locals.pageName = '';
+
+    //設定 template 的helper functions
+    res.locals.dateToDateString = d=>moment(d).format('YYYY-MM-DD');
+    res.locals.dateToDateTimeString = d=>moment(d).format('YYYY-MM-DD');
     next();
 })
 
@@ -71,8 +83,10 @@ app.get('/', (req, res) => {
 });
 
 app.get('/json-sales', (req, res) => {
+    res.locals.pageName = 'json-sales';
     const sales = require('./data/sales');
     /* require 過的檔案，就不會再 require*/
+    
 
     // console.log(sales);
     // res.json(sales);
@@ -171,6 +185,8 @@ app.use('/admin3', require('./routes/admin3'));
 
 //合併寫路徑進來的時後都會用app，如果要分開管理時就會用router，router都會寫在分開的檔案哩，在這裡的例子是admin
 
+app.use('/address-book', require('./routes/address-book'));
+
 app.get('/try-sess', (req, res) => {
     req.session.myVar = req.session.myVar || 0;
     req.session.myVar++;
@@ -187,8 +203,8 @@ app.get('/try-moment', (req, res) => {
     });
 });
 
-app.get('/try-db', async (req, res)=>{
-    const [result]= await db.query('SELECT * FROM address_book WHERE `name` LIKE ?', ['%酷寶%'])
+app.get('/try-db', async (req, res) => {
+    const [result] = await db.query('SELECT * FROM address_book WHERE `name` LIKE ?', ['%酷寶%'])
     res.json(result);
 });
 // ***路由定義結束 ：END
