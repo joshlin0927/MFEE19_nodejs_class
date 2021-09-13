@@ -9,11 +9,11 @@ const MysqlStore = require('express-mysql-session')(session);
 
 const moment = require('moment-timezone');
 const upload = multer({
-    dest: 'tmp_uploads'
-})
-const uploadImg = require('./modules/upload-images')
-const uploadVid = require('./modules/upload-videos')
-const db = require('./modules/connect-mysql')
+    dest: 'tmp_uploads/'
+});
+const uploadImg = require('./modules/upload-images');
+const uploadVid = require('./modules/upload-videos');
+const db = require('./modules/connect-mysql');
 const sessionStore = new MysqlStore({}, db);
 /*
 因為我們已經有連線的設定，也就是connect-mysql，所以在大括號裡面不需要放任何東西，只要在最後放上要連到哪裡就好
@@ -57,6 +57,7 @@ app.use((req, res, next) => {
     res.locals.title = '小心的網站';
     // 這裡可以設定所有網站的title
     res.locals.pageName = '';
+    res.locals.keyword = '';
 
     //設定 template 的helper functions
     res.locals.dateToDateString = d=>moment(d).format('YYYY-MM-DD');
@@ -135,19 +136,18 @@ app.post('/try-upload', upload.single('avatar'), async (req, res) => {
         } catch (ex) {
             return res.json({
                 success: false,
-                error: '無法存檔'
+                error: '無法存檔', ex
             });
         }
 
     } else {
-        await fs.unlink(req.file.path) // 刪除暫存檔
+        await fs.unlink(req.file.path); // 刪除暫存檔
         res.json({
             success: false,
             error: '格式不對'
         });
     }
-
-})
+});
 
 app.post('/try-upload2', uploadImg.single('avatar'), async (req, res) => {
     res.json(req.file);
@@ -214,10 +214,8 @@ app.use((req, res) => {
     res.status(404).send(`<h1>找不到頁面</h1>`)
 })
 
-
 let port = process.env.PORT || 3000;
 const node_env = process.env.NODE_ENV || 'development';
-
 app.listen(port, () => {
     console.log(`NODE_ENV: ${node_env}`);
     console.log(`啟動: ${port}`, new Date());
