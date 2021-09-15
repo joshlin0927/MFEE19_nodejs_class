@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <textarea name="" id="ta" cols="80" rows="10"></textarea>
+    <br>
+    <button id="btn" onclick="getData()">get data</button>
+
+    <script>
+        function getData(){
+            fetch('http://localhost:3001/try-sess',{
+                // 因為現在是 cross origin，所以要用include
+                // 不然它原本預設是 same origin
+                credentials: "include",
+            }).then(r=>r.json())
+            .then(data=>{
+                document.querySelector('#ta').value = JSON.stringify(data,null,4);
+            })
+        }
+    </script>
+</body>
+</html>

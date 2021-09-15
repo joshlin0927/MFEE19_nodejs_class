@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hash01</title>
+    <style>
+        .box{
+            height: 800px;
+            width: 300px;
+            background-color: #ada;
+            border: 1px solid black;
+        }
+        .blue{
+            background-color: rgb(58, 185, 228);
+        }
+        .red{
+            background-color: rgb(241, 75, 75);
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <a href="#b2">b2</a>
+        <a href="#b3">b3</a>
+    </div>
+    <div class="box" id="b1">1</div>
+    <div class="box blue" id="b2">2</div>
+    <div class="box red" id="b3">3</div>
+
+    <script>
+        const whenHashChanged = ()=>{
+            // console.log(location.hash);
+        };
+
+        window.addEventListener('hashchange', whenHashChanged);
+        // whenHashChanged();
+    </script>
+</body>
+</html>

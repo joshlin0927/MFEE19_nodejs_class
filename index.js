@@ -2,7 +2,8 @@ require('dotenv').config(); // 載入 .env 的設定
 
 const express = require('express');
 const multer = require('multer');
-const fs = require('fs').promises;
+const fs = require('fs');
+const cors = require('cors');
 const session = require('express-session');
 const MysqlStore = require('express-mysql-session')(session); 
 // 上面require進來的是一個function，而要帶入的值是session
@@ -39,11 +40,19 @@ app.use(session({
     }
 }));
 
-// parse application/x-www-form-urlencoded
-app.use(express.urlencoded({
-    extended: false
-}));
 
+// 判斷是否為允許的用戶
+const corsOptions = {
+  credentials: true,
+  origin: (origin, cb)=>{
+    // console.log(`origin: ${origin}`);
+    cb(null, true);
+  }  
+};
+app.use(cors(corsOptions));
+
+// parse application/x-www-form-urlencoded
+app.use(express.urlencoded({extended: false}));
 // parse application/json
 app.use(express.json());
 /* 上面的兩個才算是Top-level Middleware*/
@@ -51,6 +60,9 @@ app.use(express.json());
 app.use('/', express.static('public'));
 app.use('/jquery', express.static('node_modules/jquery/dist'));
 app.use('/bootstrap', express.static('node_modules/bootstrap/dist'));
+
+//自訂的 middleware
+
 
 app.use((req, res, next) => {
     // res.send('middleware'); 不要在這裡用send，會出錯
