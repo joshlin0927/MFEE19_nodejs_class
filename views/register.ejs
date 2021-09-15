@@ -1,0 +1,93 @@
+<%- include('parts/html-head') %>
+<%- include('parts/navbar') %>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">會員註冊</h5>
+
+                    <form name="form1" onsubmit="checkForm(); return false;">
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">email (作為帳號使用)**</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nickname" class="form-label">暱稱</label>
+                            <input type="text" class="form-control" id="nickname" name="nickname">
+                        </div>
+                        <div class="mb-3">
+                            <label for="mobile" class="form-label">mobile</label>
+                            <input type="text" class="form-control" id="mobile" name="mobile">
+                        </div>
+                        <div class="mb-3">
+                            <label for="birthday" class="form-label">birthday</label>
+                            <input type="date" class="form-control" id="birthday" name="birthday">
+                        </div>
+                        <button type="submit" class="btn btn-primary">註冊</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<%- include('parts/script') %>
+<script>
+    const email = document.querySelector('#email');
+
+    const keyHandler = event => {
+        // console.log(event.type, event.key);
+        // TODO: 檢查格式是否符合 email 格式
+
+        const usp = new URLSearchParams();
+        usp.set('email', email.value);
+
+        fetch('/account-check?' + usp).then(r => r.json()).then(data => {
+            if (data.used) {
+                // email 已被使用
+                email.style.border = '2px solid red';
+            } else {
+                email.style.border = '1px solid #CCCCCC';
+            }
+        });
+
+    }
+
+    // email.addEventListener('keydown', keyHandler);
+    // email.addEventListener('keyup', keyHandler);
+    // email.addEventListener('keypress', keyHandler);
+    email.addEventListener('input', keyHandler);
+    // TODO: 欄位檢查
+
+    function checkForm() {
+        const fd = new FormData(document.form1);
+
+
+        // 以URLencoded 的方式送出
+        fetch('', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams(fd).toString(),
+        }).then(result => result.json()).then(obj => {
+            console.log(JSON.stringify(obj, null, 4));
+            if (obj.success) {
+                alert('註冊成功');
+                // location.href = '/address-book/list';
+            } else {
+                alert('註冊失敗\n' + (obj.error || ''));
+            }
+        })
+
+
+    }
+</script>
+<%- include('parts/html-foot') %>

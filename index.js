@@ -5,7 +5,9 @@ const multer = require('multer');
 const fs = require('fs');
 const cors = require('cors');
 const session = require('express-session');
-const MysqlStore = require('express-mysql-session')(session); 
+const jwt = require('jsonwebtoken');
+const cors = require('cors');
+const MysqlStore = require('express-mysql-session')(session);
 // 上面require進來的是一個function，而要帶入的值是session
 
 const moment = require('moment-timezone');
@@ -41,6 +43,20 @@ app.use(session({
 }));
 
 
+const corsOptions = {
+    credentials: true,
+    origin: (origin, cb) => {
+        console.log(`origin: ${origin}`);
+        cb(null, true);
+    }
+};
+app.use(cors(corsOptions));
+
+
+// parse application/x-www-form-urlencoded
+app.use(express.urlencoded({
+    extended: false
+}));
 // 判斷是否為允許的用戶
 const corsOptions = {
   credentials: true,
@@ -61,10 +77,8 @@ app.use('/', express.static('public'));
 app.use('/jquery', express.static('node_modules/jquery/dist'));
 app.use('/bootstrap', express.static('node_modules/bootstrap/dist'));
 
-//自訂的 middleware
-
-
-app.use((req, res, next) => {
+// 自訂的 middleware
+app.use(async (req, res, next) => {
     // res.send('middleware'); 不要在這裡用send，會出錯
     res.locals.title = '小心的網站';
     // 這裡可以設定所有網站的title
@@ -72,10 +86,27 @@ app.use((req, res, next) => {
     res.locals.keyword = '';
 
     //設定 template 的helper functions
-    res.locals.dateToDateString = d=>moment(d).format('YYYY-MM-DD');
-    res.locals.dateToDateTimeString = d=>moment(d).format('YYYY-MM-DD');
+    res.locals.dateToDateString = d => moment(d).format('YYYY-MM-DD');
+    res.locals.dateToDateTimeString = d => moment(d).format('YYYY-MM-DD');
+    res.locals.session = req.session; // 把session傳到頁面
+
+    // jwt 驗證
+    req.myAuth = null; //自訂屬性 myAuth
+
+    const auth = req.get('Authorization');
+
+    if(auth && auth.indexOf('Bearer ')===0){
+        const token = auth.slice(7);
+        try{
+            req.myAuth = await jwt.verify(token, process.env.JWT_SECRET);
+            console.log('req.myAuth:', req.myAuth);
+        } catch(ex) {
+            console.log('jwt-ex:', ex);
+        }
+    }
+
     next();
-})
+});
 
 
 // ***路由定義開始 ：BEGIN
@@ -99,7 +130,7 @@ app.get('/json-sales', (req, res) => {
     res.locals.pageName = 'json-sales';
     const sales = require('./data/sales');
     /* require 過的檔案，就不會再 require*/
-    
+
 
     // console.log(sales);
     // res.json(sales);
@@ -148,7 +179,8 @@ app.post('/try-upload', upload.single('avatar'), async (req, res) => {
         } catch (ex) {
             return res.json({
                 success: false,
-                error: '無法存檔', ex
+                error: '無法存檔',
+                ex
             });
         }
 
@@ -191,6 +223,7 @@ app.get(/^\/m\/09\d{2}-?\d{3}-?\d{3}$/i, (req, res) => {
 });
 
 app.use(require('./routes/admin2'));
+app.use(require('./routes/login'));
 app.use('/admin3', require('./routes/admin3'));
 
 //admin2、admin3，兩者的路徑並不一樣，所以可以用作檔案版本管理
