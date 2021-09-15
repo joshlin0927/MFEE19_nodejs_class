@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="//localhost:3001/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="fontawesome-free-5.15.3-web/css/all.css">
+  <title>小心的網站</title>
+</head>
+
+<body>
+
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">登入 (JWT)</h5>
+            <textarea id="ta" cols="50" rows="10"></textarea>
+
+            <br>
+            <button type="button" class="btn btn-primary" onclick="getData()">取得資料</button>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <script src="//localhost:3001/jquery/jquery.min.js"></script>
+  <script src="//localhost:3001/bootstrap/js/bootstrap.min.js"></script>
+  <script>
+    const ta = document.querySelector('#ta');
+
+    function getData(){
+        // 取得 token
+        const token = localStorage.getItem('token');
+        if(!token){
+            alert('沒有 token');
+            return;
+        }
+
+        fetch('/get-data-jwt', {
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        }).then(r=>r.json()).then(obj=>{
+            ta.value = JSON.stringify(obj, null, 4);
+        });
+    }
+
+  </script>
+</body>
+
+</html>

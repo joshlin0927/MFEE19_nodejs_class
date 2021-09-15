@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="//localhost:3001/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//localhost:3001/fontawesome-free-5.15.3-web/css/all.css">
+    <title>小心的網站</title>
+</head>
+<body>
+
+
+<!-- <div class="containter">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">Navbar</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link " href="/json-sales">業務列表</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link " href="/address-book/list">通訊錄列表</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link " href="/address-book/add">新增通訊錄</a>
+          </li>
+           
+            <li class="nav-item">
+              <a class="nav-link active" href="/login">登入</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link " href="/register">註冊</a>
+            </li>
+           
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              Dropdown
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+            </ul>
+          </li>
+        </ul>
+        <form class="d-flex" action="/address-book/list">
+          <input class="form-control me-2" type="search" placeholder="Search" name="keyword" aria-label="Search" value="">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+</div> -->
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">會員登入</h5>
+                    <form name="form1" onsubmit="checkForm(); return false;">
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">email (帳號)</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                       
+                        <button type="submit" class="btn btn-primary">登入</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<Script src="//localhost:3001/jquery/jquery.min.js"></Script>
+<script src="//localhost:3001/bootstrap/js/bootstrap.min.js"></script>
+<script>
+
+    // TODO: 欄位檢查
+
+    function checkForm() {
+        const fd = new FormData(document.form1);
+
+        // 以URLencoded 的方式送出，fetch 裡面放的是空字串，代表的是它適用於目前這個頁面，當然也可以指定某個頁面
+        // 判斷使否有登入網站，在react
+        // 可以將資料儲存在stay
+
+        fetch('login-jwt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams(fd).toString(),
+        }).then(result => result.json()).then(obj => {
+            console.log(JSON.stringify(obj, null, 4));
+            if (obj.success) {
+                localStorage.setItem('token', obj.token); // 儲存到localStorage
+                localStorage.setItem('member', JSON.stringify(obj.member)); // 因為localStorage只能儲存字串，所以對於object需要用JSON.stringify做解析
+                alert('登入成功');
+
+            } else {
+                alert('登入失敗\n' + (obj.error || ''));
+            }
+        })
+
+
+    }
+</script>
+</body>
+</html>

@@ -1,8 +1,6 @@
 const express = require('express');
-const db = require('./../modules/connect-mysql')
-const upload = require('./../modules/upload-images')
-
-
+const db = require('./../modules/connect-mysql');
+const upload = require('./../modules/upload-images');
 
 const router = express.Router();
 
@@ -12,7 +10,7 @@ async function getListData(req,res){
     let keyword = req.query.keyword || '';
     keyword = keyword.trim(); //去掉頭尾的空白
 
-    res.locals.keyword = keyword; // 傳給template
+    // res.locals.keyword = keyword; // 傳給template
     const output = {
 
     };
@@ -65,6 +63,8 @@ async function getListData(req,res){
     }
     return output;
 }
+
+router.getListData = getListData; // 將 function 掛在 router 物件上做匯出
 
 router.get('/', (req, res) => {
     res.render('address-book/main');
@@ -133,9 +133,6 @@ router.route('/add')
         } catch (ex) {
             output.error = ex.toString();
         }
-
-
-
         output.result = result;
         if (result.affectedRows && result.insertId) {
             output.success = true;
