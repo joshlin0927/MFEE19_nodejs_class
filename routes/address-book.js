@@ -43,7 +43,7 @@ async function getListData(req,res){
             return output;
 
             /*
-            // 下面是原本的寫法，但在用redirect的function時，就不能這樣寫
+            // 下面是原本的寫法，但在用redirect的function時，同上，就不能像下面這樣寫
             // return res.redirect(req.baseUrl);// 會轉到根目錄
             // return res.redirect('?page=1');
             */

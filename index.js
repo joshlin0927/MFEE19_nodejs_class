@@ -6,7 +6,6 @@ const fs = require('fs');
 const cors = require('cors');
 const session = require('express-session');
 const jwt = require('jsonwebtoken');
-const cors = require('cors');
 const MysqlStore = require('express-mysql-session')(session);
 // 上面require進來的是一個function，而要帶入的值是session
 
@@ -33,24 +32,15 @@ app.set('view engine', 'ejs');
 
 app.use(session({
     name: 'mySessionId',
-    saveUninitialized: false,
-    resave: false,
-    secret: '54weewf254ewf4874gew231',
-    store: sessionStore,
+    saveUninitialized: false, // 還沒有用到session時，要不要儲存，這裡設定為否，主要看系統要求
+    resave: false, // 如果沒有變更時，要不要儲存，這是保險用
+    secret: '54weewf254ewf4874gew231',  // 加密的字串
+    store: sessionStore, 
     cookie: {
-        maxAge: 1200000, //20分鐘，這裡寫得是毫秒
+        maxAge: 1200000, // 存活時間，是依據cookie的，這裡設定為1200000毫秒=20分鐘，
     }
 }));
 
-
-const corsOptions = {
-    credentials: true,
-    origin: (origin, cb) => {
-        console.log(`origin: ${origin}`);
-        cb(null, true);
-    }
-};
-app.use(cors(corsOptions));
 
 
 // parse application/x-www-form-urlencoded
@@ -88,6 +78,7 @@ app.use(async (req, res, next) => {
     //設定 template 的helper functions
     res.locals.dateToDateString = d => moment(d).format('YYYY-MM-DD');
     res.locals.dateToDateTimeString = d => moment(d).format('YYYY-MM-DD');
+
     res.locals.session = req.session; // 把session傳到頁面
 
     // jwt 驗證
@@ -263,5 +254,5 @@ let port = process.env.PORT || 3000;
 const node_env = process.env.NODE_ENV || 'development';
 app.listen(port, () => {
     console.log(`NODE_ENV: ${node_env}`);
-    console.log(`啟動: ${port}`, new Date());
+    console.log(`啟動: ${port}`, Date());
 });

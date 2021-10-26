@@ -197,7 +197,7 @@
         fetch('/address-book/api/list?' + usp.toString())
             .then(r=>r.json())
             .then(data=>{
-                console.log(data);
+                console.log("incoming data:", data);
                 render(data);
             });
     }

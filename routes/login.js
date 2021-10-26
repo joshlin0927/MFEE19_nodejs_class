@@ -4,8 +4,10 @@ const jwt = require('jsonwebtoken')
 
 
 const db = require('./../modules/connect-mysql');
-const upload = require('./../modules/upload-images');
+// const upload = require('./../modules/upload-images');
 
+
+// 這邊要提取的是address-book裡面的function，所以要把getListData包起來
 const { getListData } = require('./address-book');
 
 const router = express.Router();
@@ -28,6 +30,7 @@ router.post('/login', async (req, res) => {
     }
     // rs[0]
     const success = await bcrypt.compare(req.body.password, rs[0].password);
+    // 這裡設定的是登入後的session要給的資料
     if (success) {
         const {
             id,
@@ -127,6 +130,7 @@ router.post('/login-jwt', async (req, res) => {
     }
     // rs[0]
     const success = await bcrypt.compare(req.body.password, rs[0].password);
+    // 這裡設定的是登入後的token要給的資料
     if (success) {
         const {
             id,
