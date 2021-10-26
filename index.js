@@ -42,12 +42,17 @@ app.use(session({
 }));
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9b32b22f6054c76b0d650c8221c42b778e1082a2
 // parse application/x-www-form-urlencoded
 app.use(express.urlencoded({
     extended: false
 }));
+
 // 判斷是否為允許的用戶
+// 原本是用作白名單，只接受紀錄的IP拜訪網站
 const corsOptions = {
   credentials: true,
   origin: (origin, cb)=>{
@@ -222,6 +227,8 @@ app.use('/admin3', require('./routes/admin3'));
 //合併寫路徑進來的時後都會用app，如果要分開管理時就會用router，router都會寫在分開的檔案哩，在這裡的例子是admin
 
 app.use('/address-book', require('./routes/address-book'));
+
+app.use('/product', require('./routes/product'));
 
 app.get('/try-sess', (req, res) => {
     req.session.myVar = req.session.myVar || 0;
